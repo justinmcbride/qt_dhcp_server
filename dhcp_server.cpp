@@ -16,7 +16,7 @@ void dhcp_server_t::setup( int interface_index )
   }
   m_socket_listener = new QUdpSocket( this );
   connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
-  bool b = m_socket_listener->bind( QHostAddress::Any, PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
+  bool b = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
   emit LogMessage( QString( "Bind success: %1" ).arg( b ) );
   qDebug() << "bind = " << b;
 }
@@ -27,6 +27,6 @@ void dhcp_server_t::readPendingDatagrams()
   {
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
     qDebug() << datagram.data();
-    emit LogMessage( datagram.data() );
+    emit LogMessage( datagram.data().toHex() );
   }
 }
