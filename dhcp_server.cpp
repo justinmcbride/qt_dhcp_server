@@ -1,4 +1,5 @@
 #include "dhcp_server.h"
+#include "dhcp_message.h"
 #include <QNetworkDatagram>
 
 
@@ -26,7 +27,7 @@ void dhcp_server_t::readPendingDatagrams()
   while( m_socket_listener->hasPendingDatagrams() )
   {
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
-    qDebug() << datagram.data();
+    auto msg = reinterpret_cast<dhcp_message_t*>( datagram.data() );
     emit LogMessage( datagram.data().toHex() );
   }
 }

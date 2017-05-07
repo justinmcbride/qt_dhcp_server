@@ -28,6 +28,7 @@ SOURCES += main.cpp\
     dhcp_server.cpp
 
 HEADERS  += mainwindow.h \
-    dhcp_server.h
+    dhcp_server.h \
+    dhcp_message.h
 
 FORMS    += mainwindow.ui
