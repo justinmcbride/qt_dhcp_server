@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QComboBox>
+#include <QLabel>
 #include "dhcp_server.h"
 
 namespace Ui {
@@ -20,6 +21,7 @@ public:
 private:
   Ui::MainWindow *ui;
   dhcp_server_t* m_server{ new dhcp_server_t( this ) };
+  QLabel* m_label_count{ new QLabel(this) };
 
 private slots:
   void LogMessage( QString message );

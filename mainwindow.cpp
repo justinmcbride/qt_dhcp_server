@@ -21,7 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
       auto name = QString( "%1 (%2)" ).arg(interface.humanReadableName()).arg(interface.addressEntries().back().ip().toString() );
       ui->cb_interface->addItem( name, interface.index() );
     }
-  } //m_server->setup();
+  }
+
+  ui->statusBar->addWidget( m_label_count );
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +33,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::LogMessage(QString message)
 {
+  static int count = 0;
+  count++;
   ui->te_log->append( message );
+  m_label_count->setText( QString("Responses: %1").arg(count) );
 }
 
 void MainWindow::slot_interface_changed(int index)
