@@ -25,7 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dhcp_server.cpp
+    dhcp_server.cpp \
+    dhcp_message.cpp
 
 HEADERS  += mainwindow.h \
     dhcp_server.h \

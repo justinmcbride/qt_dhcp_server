@@ -3,7 +3,12 @@
 
 #include <cstdint>
 
+#include <QByteArray>
+#include <QObject>
+#include <QDebug>
+
 struct dhcp_message_t {
+
   uint8_t op; uint8_t htype; uint8_t hlen; uint8_t hops;
   uint32_t xid;
   uint16_t secs;  uint16_t flags;
@@ -14,6 +19,10 @@ struct dhcp_message_t {
   uint32_t chaddr[4];
   uint8_t sname[64];
   uint8_t file[128];
+
+  dhcp_message_t( QByteArray message_data );
+
+  QString toString() const;
 };
 
 #endif // DHCP_MESSAGE_H

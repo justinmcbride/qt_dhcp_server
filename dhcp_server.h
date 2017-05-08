@@ -21,7 +21,7 @@ public slots:
 private slots:
   void readPendingDatagrams();
 private:
-  QUdpSocket* m_socket_listener{ new QUdpSocket(this) };
+  QUdpSocket* m_socket_listener{ nullptr };
 };
 
 #endif // DHCP_SERVER_H
