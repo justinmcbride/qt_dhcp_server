@@ -5,7 +5,6 @@
 
 dhcp_server_t::dhcp_server_t(QObject *parent) : QObject(parent)
 {
-  qDebug() << __FUNCTION__;
 }
 
 void dhcp_server_t::setup( int interface_index )
@@ -27,7 +26,6 @@ void dhcp_server_t::readPendingDatagrams()
 {
   while( m_socket_listener->hasPendingDatagrams() )
   {
-    qDebug() << __FUNCTION__;
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
     dhcp_message_t msg( datagram.data() );
     emit LogMessage( msg.toString() );
