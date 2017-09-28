@@ -93,7 +93,8 @@ void dhcp_message_t::parseOptions( QByteArray data )
 
 QString dhcp_message_t::toString() const
 {
-  return QString( "%1 %2" )
+  return QString( "%1 %2 %3" )
       .arg( ::toString(request_type) )
-      .arg( client_hostname );
+      .arg( client_hostname )
+      .arg( hardware_address_client );
 }
