@@ -1,22 +1,22 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QComboBox>
 #include <QLabel>
+
 #include "dhcp_server.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class WindowMain : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = 0);
-  ~MainWindow();
+  explicit WindowMain(QWidget *parent = 0);
+  ~WindowMain();
 
 private:
   Ui::MainWindow *ui;
@@ -27,5 +27,3 @@ private slots:
   void LogMessage( QString message );
   void slot_interface_changed( int index );
 };
-
-#endif // MAINWINDOW_H

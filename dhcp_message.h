@@ -1,12 +1,14 @@
-#ifndef DHCP_MESSAGE_H
-#define DHCP_MESSAGE_H
+#pragma once
 
 #include <cstdint>
+#include <array>
 
 #include <QByteArray>
 #include <QObject>
 #include <QDebug>
 #include <QHostAddress>
+
+#include "dhcp_option_t.h"
 
 struct dhcp_header_t {
   uint8_t op; uint8_t htype; uint8_t hlen; uint8_t hops;
@@ -14,18 +16,18 @@ struct dhcp_header_t {
   uint16_t secs;  uint16_t flags;
   uint32_t ciaddr;
   uint32_t yiaddr;
-  uint32_t siaddr;
-  uint32_t giaddr;
-  uint8_t chaddr[16];
-  uint8_t sname[64];
-  uint8_t file[128];
+  uint32_t siaddr;  // IP address of next server to use in bootstrap; returned in DHCPOFFER, DHCPACK by server.
+  uint32_t giaddr;  // Relay agent IP address, used in booting via a relay agent.
+  uint8_t chaddr[16]; // Client hardware address.
+  uint8_t sname[64]; // Optional server host name, null terminated string.  
+  uint8_t file[128]; // Boot file name, null terminated string; "generic" name or null in DHCPDISCOVER, fully qualified directory-path name in DHCPOFFER
   uint8_t cookie[4];
 };
 auto constexpr MIN_DHCP_SIZE = sizeof( dhcp_header_t );
 
-enum class OpType {
-  BOOT_REQUEST,
-  BOOT_REPLY
+enum class OpType : uint8_t {
+  BOOT_REQUEST = 1,
+  BOOT_REPLY = 2
 };
 
 enum class DhcpRequestType {
@@ -59,34 +61,78 @@ static inline QString toString( DhcpRequestType type )
   else return QString("UNKNOWN %1").arg(static_cast<int>(type));
 }
 
-struct dhcp_message_t {
-  OpType operation;
-  int hardware_type;
-  int hardware_length;
-  int hops;
+typedef std::array< uint8_t, 6 > mac_address_t;
+static inline QString toString( mac_address_t address )
+{
+  QString s;
+  for( int i = 0; i < address.size(); i++ )
+  {
+    s += QString::number( address[i], 16 );
+    if( i < ( address.size() - 1) ) s += ":";
+  }
+  return s;
+}
 
-  int transaction_id;
 
-  int seconds;
-  bool broadcast;
+class dhcp_message_t
+{
+  private:
+    OpType m_operation;
+    int m_hardware_type{ 1 };
+    int m_hardware_length{ 6 };
+    int m_hops{ 0 };
 
-  DhcpRequestType request_type;
+    uint32_t m_transaction_id;
 
-  QHostAddress address_client;
-  QHostAddress address_yours;
-  QHostAddress address_nextServer;
-  QHostAddress address_relay;
+    int m_seconds{ 0 };
+    bool m_is_broadcast;
 
-  QByteArray options;
+    DhcpRequestType request_type;
 
-  QString hardware_address_client;
-  QString client_hostname;
+    QHostAddress m_address_client{ "0.0.0.0" };
+    QHostAddress m_address_yours{ "0.0.0.0" };
+    QHostAddress m_address_nextServer{ "0.0.0.0" };
+    QHostAddress m_address_relay{ "0.0.0.0" };
 
-  dhcp_message_t( QByteArray message_data );
+    QByteArray m_options;
 
-  void parseOptions( QByteArray data );
+    mac_address_t m_hardware_address_client;
+    QString m_client_hostname;
 
-  QString toString() const;
+    void parseOptions( QByteArray data );
+
+  public:
+
+    void SetOperationType( OpType type ) { m_operation = type; }
+    void SetHardwareType( int type ) { m_hardware_type = type; }
+    void SetHops( int hops ) { m_hops = hops; }
+    void SetTransactionId( uint32_t transaction_id ) { m_transaction_id = transaction_id; }
+    void SetClientAddress( QHostAddress client_addresss ) { m_address_client = client_addresss; }
+    void SetClientMAC( mac_address_t client_mac ) { m_hardware_address_client = client_mac; }
+    
+    dhcp_message_t() { }
+    dhcp_message_t( QByteArray message_data );
+
+    QString toString() const;
+    QByteArray serialize() const;
 };
 
-#endif // DHCP_MESSAGE_H
+static QByteArray CreateDiscover();
+static QByteArray CreateOffer();
+static QByteArray CreateRequest();
+static QByteArray CreateDecline();
+static QByteArray CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac )
+{
+  dhcp_message_t dhcp;
+  dhcp.SetOperationType( OpType::BOOT_REPLY );
+  dhcp.SetHardwareType( 1 );
+  dhcp.SetTransactionId( transaction_id );
+  dhcp.SetClientAddress( client_addresss );
+  dhcp.SetClientMAC( client_mac );
+
+  return dhcp.serialize();
+}
+
+static QByteArray CreateNAK();
+static QByteArray CreateRelease();
+static QByteArray CreateInform();

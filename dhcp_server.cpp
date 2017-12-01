@@ -3,7 +3,8 @@
 #include <QNetworkDatagram>
 
 
-dhcp_server_t::dhcp_server_t(QObject *parent) : QObject(parent)
+dhcp_server_t::dhcp_server_t( QObject *parent ) :
+  QObject( parent )
 {
 }
 
@@ -18,7 +19,7 @@ void dhcp_server_t::setup( int interface_index )
   m_socket_listener = new QUdpSocket( this );
   connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
   bool b = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
-  emit LogMessage( QString( "Bind success: %1" ).arg( b ) );
+  emit LogMessage( QString( "Bind success: %1" ).arg( b ? "true" : "false" ) );
   qDebug() << "bind = " << b;
 }
 
