@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QHostAddress>
 
-#include "dhcp_option_t.h"
+#include "dhcp_option.h"
 
 struct dhcp_header_t {
   uint8_t op; uint8_t htype; uint8_t hlen; uint8_t hops;
@@ -30,7 +30,7 @@ enum class OpType : uint8_t {
   BOOT_REPLY = 2
 };
 
-enum class DhcpRequestType {
+enum class DhcpRequestType : uint8_t {
   DHCPDISCOVER = 1,
   DHCPOFFER,
   DHCPREQUEST,
@@ -94,7 +94,7 @@ class dhcp_message_t
     QHostAddress m_address_nextServer{ "0.0.0.0" };
     QHostAddress m_address_relay{ "0.0.0.0" };
 
-    QByteArray m_options;
+    QMap<DhcpOption, QByteArray> m_options;
 
     mac_address_t m_hardware_address_client;
     QString m_client_hostname;
@@ -103,12 +103,17 @@ class dhcp_message_t
 
   public:
 
+    void SetRequestType( DhcpRequestType type );
     void SetOperationType( OpType type ) { m_operation = type; }
     void SetHardwareType( int type ) { m_hardware_type = type; }
     void SetHops( int hops ) { m_hops = hops; }
     void SetTransactionId( uint32_t transaction_id ) { m_transaction_id = transaction_id; }
     void SetClientAddress( QHostAddress client_addresss ) { m_address_client = client_addresss; }
     void SetClientMAC( mac_address_t client_mac ) { m_hardware_address_client = client_mac; }
+    void SetOption( DhcpOption option, QByteArray options_data ) { m_options[option] = options_data; }
+    void SetRouter( QHostAddress router_address );
+
+    DhcpRequestType GetRequestType() const { return request_type; }
     
     dhcp_message_t() { }
     dhcp_message_t( QByteArray message_data );
@@ -117,22 +122,56 @@ class dhcp_message_t
     QByteArray serialize() const;
 };
 
-static QByteArray CreateDiscover();
-static QByteArray CreateOffer();
-static QByteArray CreateRequest();
-static QByteArray CreateDecline();
-static QByteArray CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac )
+static dhcp_message_t CreateDiscover()
 {
   dhcp_message_t dhcp;
+  return dhcp;
+}
+static dhcp_message_t CreateOffer()
+{
+  dhcp_message_t dhcp;
+  dhcp.SetOperationType( OpType::BOOT_REPLY );
+  dhcp.SetRequestType( DhcpRequestType::DHCPOFFER );
+  dhcp.SetRouter( QHostAddress("192.168.1.1") );
+
+  return dhcp;
+}
+
+static dhcp_message_t CreateRequest()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}
+static dhcp_message_t CreateDecline()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}
+static dhcp_message_t CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac )
+{
+  dhcp_message_t dhcp;
+  dhcp.SetRequestType( DhcpRequestType::DHCPACK );
   dhcp.SetOperationType( OpType::BOOT_REPLY );
   dhcp.SetHardwareType( 1 );
   dhcp.SetTransactionId( transaction_id );
   dhcp.SetClientAddress( client_addresss );
   dhcp.SetClientMAC( client_mac );
 
-  return dhcp.serialize();
+  return dhcp;
 }
 
-static QByteArray CreateNAK();
-static QByteArray CreateRelease();
-static QByteArray CreateInform();
+static dhcp_message_t CreateNAK()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}
+static dhcp_message_t CreateRelease()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}
+static dhcp_message_t CreateInform()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}

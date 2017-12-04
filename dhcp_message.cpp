@@ -42,8 +42,8 @@ dhcp_message_t::dhcp_message_t( QByteArray message_data )
   }
 
   auto remaining_size = message_data.size() - MIN_DHCP_SIZE;
-  m_options = message_data.right( remaining_size );
-  parseOptions( m_options );
+  auto options = message_data.right( remaining_size );
+  parseOptions( options );
 }
 
 void dhcp_message_t::parseOptions( QByteArray data )
@@ -73,7 +73,7 @@ void dhcp_message_t::parseOptions( QByteArray data )
         {
           uint8_t requested_parameter = data.at( 0 );
           data.remove( 0, 1 );
-          qDebug() << "requested: " << requested_parameter;
+          qDebug() << "requested: " << DhcpOptionToString(requested_parameter);
         }
       }
       else if( option_type == DhcpOption::REQUESTED_IP )
@@ -160,6 +160,23 @@ void dhcp_message_t::parseOptions( QByteArray data )
   }
 }
 
+void dhcp_message_t::SetRequestType(DhcpRequestType type)
+{
+  request_type = type;
+  QByteArray array;
+  array.append( 0x1 );
+  array.append( static_cast<uint8_t>(type) );
+  SetOption( DhcpOption::DHCP_MESSAGE_TYPE, array );
+}
+
+void dhcp_message_t::SetRouter( QHostAddress router_address )
+{
+  QByteArray array;
+  array.append( 0x4 );
+  array.append( router_address.toIPv4Address() );
+  SetOption( DhcpOption::ROUTER, array );
+}
+
 QString dhcp_message_t::toString() const
 {
   return
@@ -191,10 +208,10 @@ QByteArray dhcp_message_t::serialize() const
   // ::strncpy( &header.chaddr, "", 1 );
   // ::strncpy( &header.sname, "", 1 );
   // ::strncpy( &header.file, "", 1 );
-  header.cookie[0] = 99;
-  header.cookie[1] = 130;
-  header.cookie[2] = 83;
-  header.cookie[3] = 99;
+  header.cookie[0] = 0x63;
+  header.cookie[1] = 0x82;
+  header.cookie[2] = 0x53;
+  header.cookie[3] = 0x63;
 
   ::memcpy( array.data(), &header, MIN_DHCP_SIZE );
   return array;

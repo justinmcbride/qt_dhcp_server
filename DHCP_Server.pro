@@ -17,7 +17,6 @@ SOURCES += main.cpp\
 HEADERS  += \
     dhcp_server.h \
     dhcp_message.h \
-    dhcp_option_t.h \
     window_fake_client.h \
     client.h \
     form_assignments.h \
@@ -25,7 +24,8 @@ HEADERS  += \
     global_config.h \
     window_main.h \
     static_assignment_t.h \
-    dhcp_assignments.h
+    dhcp_assignments.h \
+    dhcp_option.h
 
 FORMS    += \
     window_fake_client.ui \

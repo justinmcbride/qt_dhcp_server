@@ -79,13 +79,12 @@ bool ModelAssignments::removeColumns(int column, int count, const QModelIndex &p
 
 QVariant ModelAssignments::headerData( int section, Qt::Orientation orientation, int role ) const
 {
-  qDebug() << "section " << section;
   if( role == Qt::DisplayRole )
   {
     if( orientation == Qt::Horizontal )
     {
-      if( section == 0 )      return "First";
-      else if( section == 1 ) return "Second";
+      if( section == 0 )      return "MAC Address";
+      else if( section == 1 ) return "IP Address";
     }
   }
   return QVariant();

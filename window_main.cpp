@@ -25,7 +25,7 @@ WindowMain::WindowMain( QWidget* parent ) :
     }
   }
 
-//  ui->assignments
+  ui->le_router->setValidator( new QRegExpValidator( re_ip_address ) );
 
   connect( ui->menu_action_client, &QAction::triggered, [=] {
     auto window = new WindowFakeClient( this );

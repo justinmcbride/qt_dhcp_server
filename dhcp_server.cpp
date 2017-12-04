@@ -20,7 +20,6 @@ void dhcp_server_t::setup( int interface_index )
   connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
   bool b = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
   emit LogMessage( QString( "Bind success: %1" ).arg( b ? "true" : "false" ) );
-  qDebug() << "bind = " << b;
 }
 
 void dhcp_server_t::readPendingDatagrams()
@@ -29,6 +28,19 @@ void dhcp_server_t::readPendingDatagrams()
   {
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
     dhcp_message_t msg( datagram.data() );
+    const auto type = msg.GetRequestType();
+    switch( type )
+    {
+      case DhcpRequestType::DHCPDISCOVER:
+        
+      default:
+        ;
+    }
     emit LogMessage( msg.toString() );
   }
+}
+
+void dhcp_server_t::performOffer( dhcp_message_t request )
+{
+
 }

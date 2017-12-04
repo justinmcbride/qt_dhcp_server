@@ -15,6 +15,7 @@ class dhcp_assignments_t
 
     QVector<static_assignment_t> GetAssignments() const;
     const static_assignment_t& GetAssignment( int index ) const;
+    static_assignment_t GetAssignment( QString address ) const;
 
     int size() const { return m_assignments.size(); }
   private:

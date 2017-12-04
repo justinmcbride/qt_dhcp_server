@@ -21,6 +21,16 @@ const static_assignment_t& dhcp_assignments_t::GetAssignment( int index ) const
   return m_assignments.at(index);
 }
 
+static_assignment_t dhcp_assignments_t::GetAssignment( QString address ) const
+{
+  for( static_assignment_t assignment : m_assignments )
+  {
+    if( assignment.address() == address ) return assignment.ip();
+  }
+
+  return QString();
+}
+
 QVector<static_assignment_t> dhcp_assignments_t::GetAssignments() const
 {
   return m_assignments;

@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QtNetwork/QUdpSocket>
 
+#include "dhcp_message.h"
+
 constexpr auto PORT_DHCP_SERVER = 67;
 constexpr auto PORT_DHCP_CLIENT = 68;
 
@@ -22,4 +24,5 @@ class dhcp_server_t : public QObject
     void readPendingDatagrams();
   private:
     QUdpSocket* m_socket_listener{ nullptr };
+    void performOffer( dhcp_message_t request );
 };
