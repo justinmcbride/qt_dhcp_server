@@ -39,7 +39,7 @@ static inline QString DhcpOptionToString( int option )
   }
 }
 
-static inline QString toString( DhcpOption option )
+static inline QString toString( const DhcpOption option )
 {
   return DhcpOptionToString( static_cast<int>( option ) );
 }

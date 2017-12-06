@@ -12,7 +12,9 @@ SOURCES += main.cpp\
     model_assignments.cpp \
     window_main.cpp \
     static_assignment_t.cpp \
-    dhcp_assignments.cpp
+    dhcp_assignments.cpp \
+    bootp.cpp \
+    mac_address.cpp
 
 HEADERS  += \
     dhcp_server.h \
@@ -25,7 +27,9 @@ HEADERS  += \
     window_main.h \
     static_assignment_t.h \
     dhcp_assignments.h \
-    dhcp_option.h
+    dhcp_option.h \
+    bootp.h \
+    mac_address.h
 
 FORMS    += \
     window_fake_client.ui \

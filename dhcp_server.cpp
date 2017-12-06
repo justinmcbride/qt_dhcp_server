@@ -1,7 +1,8 @@
 #include "dhcp_server.h"
 #include "dhcp_message.h"
-#include <QNetworkDatagram>
 
+#include <QNetworkDatagram>
+#include <QDataStream>
 
 dhcp_server_t::dhcp_server_t( QObject *parent ) :
   QObject( parent )
@@ -27,20 +28,71 @@ void dhcp_server_t::readPendingDatagrams()
   while( m_socket_listener->hasPendingDatagrams() )
   {
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
-    dhcp_message_t msg( datagram.data() );
-    const auto type = msg.GetRequestType();
+    dhcp_message_t client_request( datagram.data() );
+    emit LogMessage( client_request.toString() );
+    const auto type = client_request.GetRequestType();
     switch( type )
     {
       case DhcpRequestType::DHCPDISCOVER:
-        
+      case DhcpRequestType::DHCPREQUEST:
+        performOffer( client_request );
       default:
         ;
     }
-    emit LogMessage( msg.toString() );
   }
 }
 
 void dhcp_server_t::performOffer( dhcp_message_t request )
 {
+  /*
+   If the 'giaddr' field is zero and the 'ciaddr' field is nonzero, then the server
+   unicasts DHCPOFFER and DHCPACK messages to the address in 'ciaddr'.
+   If 'giaddr' is zero and 'ciaddr' is zero, and the broadcast bit is
+   set, then the server broadcasts DHCPOFFER and DHCPACK messages to
+   0xffffffff. If the broadcast bit is not set and 'giaddr' is zero and
+   'ciaddr' is zero, then the server unicasts DHCPOFFER and DHCPACK
+   messages to the client's hardware address and 'yiaddr' address.  In
+   all cases, when 'giaddr' is zero, the server broadcasts any DHCPNAK
+   messages to 0xffffffff.
+  */
+  uint32_t transaction_id = request.m_transaction_id;
 
+  auto response = CreateOffer( QHostAddress() );
+  response.m_transaction_id = transaction_id;
+  response.SetRouter( QHostAddress( "192.168.1.1" ) );
+  response.SetClientAddress( getAddress( request.m_client_id ) );
+
+  {
+    QByteArray lease_time;
+    {
+      QDataStream stream( &lease_time, QIODevice::WriteOnly );
+      stream << quint32( 60 * 5 );
+    }
+    response.SetOption( DhcpOption::IP_LEASE_TIME, lease_time );
+  }
+
+  /*
+   A server or relay agent sending or relaying a DHCP message directly
+   to a DHCP client (i.e., not to a relay agent specified in the
+   'giaddr' field) SHOULD examine the BROADCAST bit in the 'flags'
+   field.  If this bit is set to 1, the DHCP message SHOULD be sent as
+   an IP broadcast using an IP broadcast address (preferably 0xffffffff)
+   as the IP destination address and the link-layer broadcast address as
+   the link-layer destination address.  If the BROADCAST bit is cleared
+   to 0, the message SHOULD be sent as an IP unicast to the IP address
+   specified in the 'yiaddr' field and the link-layer address specified
+   in the 'chaddr' field.  If unicasting is not possible, the message
+   MAY be sent as an IP broadcast using an IP broadcast address
+   (preferably 0xffffffff) as the IP destination address and the link-
+   layer broadcast address as the link-layer destination address.
+   */
+
+  QHostAddress target( "" );
+//  m_socket_listener->writeDatagram( response.serialize(), target, PORT_DHCP_CLIENT );
+//  qDebug() << response.serialize();
+}
+
+QHostAddress dhcp_server_t::getAddress( mac_address_t client_id )
+{
+  return QHostAddress( "192.168.1.1" );
 }

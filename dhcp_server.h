@@ -25,4 +25,6 @@ class dhcp_server_t : public QObject
   private:
     QUdpSocket* m_socket_listener{ nullptr };
     void performOffer( dhcp_message_t request );
+
+    QHostAddress getAddress( mac_address_t client_id );
 };

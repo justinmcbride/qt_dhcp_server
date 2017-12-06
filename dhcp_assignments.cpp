@@ -25,10 +25,10 @@ static_assignment_t dhcp_assignments_t::GetAssignment( QString address ) const
 {
   for( static_assignment_t assignment : m_assignments )
   {
-    if( assignment.address() == address ) return assignment.ip();
+    if( assignment.address() == address ) return assignment;
   }
 
-  return QString();
+  return static_assignment_t();
 }
 
 QVector<static_assignment_t> dhcp_assignments_t::GetAssignments() const
