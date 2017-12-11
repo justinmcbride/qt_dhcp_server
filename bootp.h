@@ -36,11 +36,16 @@ struct bootp_t
 
     BootpOpType operation;
     BootpHwType hardware_address_type;
-    quint8 hardware_address_length;
-    quint8 hops;
-    quint32 transaction_id;
-    quint16 secs;
-    quint16 flags;
+    quint8 hardware_address_length{ 0 };
+    quint8 hops{ 0 };
+    quint32 transaction_id{ 0 };
+    quint16 secs{ 0 };
+    quint16 flags{ 0 };
+
+    quint32 ciaddr{ 0 };
+    quint32 yiaddr{ 0 };
+    quint32 siaddr{ 0 };
+    quint32 giaddr{ 0 };
 
     mac_address_t hardware_address_client;
 

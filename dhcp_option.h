@@ -12,6 +12,7 @@ enum class DhcpOption {
   REQUESTED_IP = 50,
   IP_LEASE_TIME = 51,
   DHCP_MESSAGE_TYPE = 53,
+  DHCP_SERVER_IDENTIFIER = 54,
   PARAMETER_REQUEST_LIST = 55,
   DHCP_MAX_SIZE = 57,
   CLIENT_ID = 61,
@@ -31,6 +32,7 @@ static inline QString DhcpOptionToString( int option )
     case 50: return "REQUESTED_IP";
     case 51: return "IP_LEASE_TIME";
     case 53: return "DHCP_MESSAGE_TYPE";
+    case 54: return "DHCP_SERVER_IDENTIFIER";
     case 55: return "PARAMETER_REQUEST_LIST";
     case 57: return "DHCP_MAX_SIZE";
     case 61: return "CLIENT_ID";
@@ -52,6 +54,7 @@ static DhcpOption getOptionType( uint8_t val )
     case 12: return DhcpOption::HOSTNAME;
     case 50: return DhcpOption::REQUESTED_IP;
     case 53: return DhcpOption::DHCP_MESSAGE_TYPE;
+    case 54: return DhcpOption::DHCP_SERVER_IDENTIFIER;
     case 55: return DhcpOption::PARAMETER_REQUEST_LIST;
     case 57: return DhcpOption::DHCP_MAX_SIZE;
     case 61: return DhcpOption::CLIENT_ID;

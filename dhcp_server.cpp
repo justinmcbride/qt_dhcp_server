@@ -17,6 +17,8 @@ void dhcp_server_t::setup( int interface_index )
     delete m_socket_listener;
     m_socket_listener = nullptr;
   }
+  m_server_interface = QNetworkInterface::interfaceFromIndex( interface_index );
+  m_server_address = m_server_interface.addressEntries().back().ip().toString();
   m_socket_listener = new QUdpSocket( this );
   connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
   bool b = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
@@ -28,16 +30,23 @@ void dhcp_server_t::readPendingDatagrams()
   while( m_socket_listener->hasPendingDatagrams() )
   {
     QNetworkDatagram datagram = m_socket_listener->receiveDatagram();
-    dhcp_message_t client_request( datagram.data() );
-    emit LogMessage( client_request.toString() );
-    const auto type = client_request.GetRequestType();
-    switch( type )
+    try
     {
-      case DhcpRequestType::DHCPDISCOVER:
-      case DhcpRequestType::DHCPREQUEST:
-        performOffer( client_request );
-      default:
-        ;
+      dhcp_message_t client_request( datagram.data() );
+      emit LogMessage( client_request.toString() );
+      const auto type = client_request.GetRequestType();
+      switch( type )
+      {
+        case DhcpRequestType::DHCPDISCOVER:
+        case DhcpRequestType::DHCPREQUEST:
+          performOffer( client_request );
+        default:
+          ;
+      }
+    }
+    catch( ... )
+    {
+      continue;
     }
   }
 }
@@ -55,22 +64,19 @@ void dhcp_server_t::performOffer( dhcp_message_t request )
    all cases, when 'giaddr' is zero, the server broadcasts any DHCPNAK
    messages to 0xffffffff.
   */
-  uint32_t transaction_id = request.m_transaction_id;
 
-  auto response = CreateOffer( QHostAddress() );
-  response.m_transaction_id = transaction_id;
+  auto response = dhcp_message_t::CreateOffer( QHostAddress() );
+  response.header.transaction_id = request.header.transaction_id;
   response.SetRouter( QHostAddress( "192.168.1.1" ) );
   response.SetClientAddress( getAddress( request.m_client_id ) );
+  response.SetSubnet( m_address_subnet );
+  response.SetDns( m_address_dns );
+  response.SetClientMAC( request.header.hardware_address_client );
+  response.SetLeaseTime( 60 * 5 );
+  response.SetServerIdentifier( m_server_address );
 
-  {
-    QByteArray lease_time;
-    {
-      QDataStream stream( &lease_time, QIODevice::WriteOnly );
-      stream << quint32( 60 * 5 );
-    }
-    response.SetOption( DhcpOption::IP_LEASE_TIME, lease_time );
-  }
-
+  auto response_data = response.serialize();
+  qDebug() << response_data;
   /*
    A server or relay agent sending or relaying a DHCP message directly
    to a DHCP client (i.e., not to a relay agent specified in the
@@ -87,12 +93,11 @@ void dhcp_server_t::performOffer( dhcp_message_t request )
    layer broadcast address as the link-layer destination address.
    */
 
-  QHostAddress target( "" );
-//  m_socket_listener->writeDatagram( response.serialize(), target, PORT_DHCP_CLIENT );
-//  qDebug() << response.serialize();
+  QHostAddress target( "192.168.86.51" );
+  m_socket_listener->writeDatagram( response_data, target, PORT_DHCP_CLIENT );
 }
 
 QHostAddress dhcp_server_t::getAddress( mac_address_t client_id )
 {
-  return QHostAddress( "192.168.1.1" );
+  return QHostAddress( "192.168.86.51" );
 }

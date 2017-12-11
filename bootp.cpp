@@ -62,5 +62,32 @@ bool bootp_t::deserialize( QByteArray data )
 
 QByteArray bootp_t::serialize() const
 {
-  return QByteArray();
+  QByteArray output_array;
+
+  QDataStream stream( &output_array, QIODevice::WriteOnly );
+  stream <<
+    static_cast<quint8>( operation ) << static_cast<quint8>( hardware_address_type ) << hardware_address_length << hops <<
+    transaction_id <<
+    secs << flags <<
+    ciaddr <<
+    yiaddr <<
+    siaddr <<
+    giaddr
+  ;
+
+  QByteArray chaddr;
+  chaddr.fill( 0, 16 );
+  stream.writeRawData( chaddr.data(), chaddr.size() );
+
+  QByteArray sname;
+  sname.fill( 0, 64 );
+  stream.writeRawData( sname.data(), sname.size() );
+
+  QByteArray file;
+  file.fill( 0, 128 );
+  stream.writeRawData( file.data(), file.size() );
+
+  stream.writeRawData( COOKIE.data(), COOKIE.size() );
+
+  return output_array;
 }

@@ -2,6 +2,7 @@
 #include "bootp.h"
 
 #include <QString>
+#include <QDataStream>
 
 dhcp_message_t::dhcp_message_t( QByteArray message_data )
 {
@@ -11,22 +12,9 @@ dhcp_message_t::dhcp_message_t( QByteArray message_data )
   bool good = header.deserialize( preamble );
   if( !good )
   {
-    qDebug() << "couldn't serialize header";
+    qDebug() << "couldn't deserialize header";
     throw std::invalid_argument( "something" );
   }
-
-//  m_operation = static_cast<OpType>( hdr->op );
-//  m_hardware_type = hdr->htype;
-//  m_hardware_length = hdr->hlen;
-//  m_hops = hdr->hops;
-//  m_transaction_id = hdr->xid;
-//  m_seconds = hdr->secs;
-//  m_is_broadcast = ( hdr->flags & 0x80 );
-
-//  m_address_client = QHostAddress( hdr->ciaddr );
-//  m_address_yours = QHostAddress( hdr->yiaddr );
-//  m_address_nextServer = QHostAddress( hdr->siaddr );
-//  m_address_relay = QHostAddress( hdr->giaddr );
 
   parseOptions( message_data );
 }
@@ -38,6 +26,10 @@ void dhcp_message_t::parseOptions( QByteArray data )
   while( data.size() )
   {
     auto option_type = getOptionType( data.at( 0 ) );
+    if( option_type == DhcpOption::UNKNOWN )
+    {
+      qDebug() << "uh oh";
+    }
     qDebug() << "--->[" << DhcpOptionToString( data.at( 0 ) ) << "]";
     data.remove( 0, 1 );
     if( option_type == DhcpOption::PAD )
@@ -49,31 +41,38 @@ void dhcp_message_t::parseOptions( QByteArray data )
       qDebug() << "padding=" << data.size();
       data.clear();
     }
+    else if( option_type == DhcpOption::DHCP_MAX_SIZE )
+    {
+      quint8 option_length = data.at( 0 );
+      data.remove( 0, 1 );
+
+      data.remove( 0, option_length );
+    }
     else if( option_type == DhcpOption::PARAMETER_REQUEST_LIST )
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
 
       qDebug() << "requesting " << option_length << " items";
       for( int i = 0; i < option_length; i++ )
       {
-        uint8_t requested_parameter = data.at( 0 );
+        quint8 requested_parameter = data.at( 0 );
         data.remove( 0, 1 );
         qDebug() << "requested: " << DhcpOptionToString(requested_parameter);
       }
     }
     else if( option_type == DhcpOption::REQUESTED_IP )
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
       if( option_length != 4 )
       {
         qDebug() << "some problem with length: " << option_length;
       }
-      uint8_t byte_1 = data.at( 0 );
-      uint8_t byte_2 = data.at( 1 );
-      uint8_t byte_3 = data.at( 2 );
-      uint8_t byte_4 = data.at( 3 );
+      quint8 byte_1 = data.at( 0 );
+      quint8 byte_2 = data.at( 1 );
+      quint8 byte_3 = data.at( 2 );
+      quint8 byte_4 = data.at( 3 );
 
       auto ip =
         QString( "%0.%1.%2.%3" )
@@ -88,20 +87,20 @@ void dhcp_message_t::parseOptions( QByteArray data )
     }
     else if( option_type == DhcpOption::DHCP_MESSAGE_TYPE )
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
       if( option_length != 1 )
       {
         qDebug() << "invalid length for opt";
       }
-      uint8_t type = data.at( 0 );
+      quint8 type = data.at( 0 );
       request_type = static_cast<DhcpRequestType>( type );
       qDebug() << "type: " << ::toString( request_type );
       data.remove( 0, option_length );
     }
     else if( option_type == DhcpOption::HOSTNAME )
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
 
       m_client_hostname = data.left( option_length );
@@ -110,10 +109,10 @@ void dhcp_message_t::parseOptions( QByteArray data )
     }
     else if( option_type == DhcpOption::CLIENT_ID )
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
 
-      uint8_t type = data.at( 0 );
+      quint8 type = data.at( 0 );
       data.remove( 0, 1 );
       option_length--;
 
@@ -131,7 +130,7 @@ void dhcp_message_t::parseOptions( QByteArray data )
     }
     else
     {
-      uint8_t option_length = data.at( 0 );
+      quint8 option_length = data.at( 0 );
       data.remove( 0, 1 );
 
       qDebug() << "Removing " << int(option_length);
@@ -145,29 +144,15 @@ void dhcp_message_t::SetRequestType(DhcpRequestType type)
 {
   request_type = type;
   QByteArray array;
-  array.append( 0x1 );
-  array.append( static_cast<uint8_t>(type) );
+  array.append( static_cast<quint8>(type) );
   SetOption( DhcpOption::DHCP_MESSAGE_TYPE, array );
 }
 
-void dhcp_message_t::SetOperationType( BootpOpType type )
-{
-  header.operation = type;
-}
-
-void dhcp_message_t::SetHardwareType( int type )
-{
-//  header.hardware_address_length = type;
-}
-
-void dhcp_message_t::SetHops( int hops )
-{
-  header.hops = hops;
-}
-
-void dhcp_message_t::SetClientMAC(mac_address_t client_mac)
+void dhcp_message_t::SetClientMAC( mac_address_t client_mac )
 {
   header.hardware_address_client = client_mac;
+  header.hardware_address_length = 6;
+  header.hardware_address_type = BootpHwType::ETHERNET;
 }
 
 void dhcp_message_t::SetOption(DhcpOption option, QByteArray options_data)
@@ -176,17 +161,59 @@ void dhcp_message_t::SetOption(DhcpOption option, QByteArray options_data)
   m_options[option] = options_data;
 }
 
-void dhcp_message_t::SetRouter( QHostAddress router_address )
+void dhcp_message_t::SetRouter( QHostAddress address )
 {
-  QByteArray array;
-  array.append( 0x4 );
-  array.append( router_address.toIPv4Address() );
-  SetOption( DhcpOption::ROUTER, array );
+  QByteArray data;
+  {
+    QDataStream stream( &data, QIODevice::WriteOnly );
+    stream << address.toIPv4Address();
+  }
+  SetOption( DhcpOption::ROUTER, data );
 }
 
-void dhcp_message_t::SetClientAddress(QHostAddress client_addresss)
+void dhcp_message_t::SetClientAddress(QHostAddress address)
 {
-  m_address_client = client_addresss;
+  m_address_client = address;
+}
+
+void dhcp_message_t::SetServerIdentifier(QHostAddress address)
+{
+  QByteArray data;
+  {
+    QDataStream stream( &data, QIODevice::WriteOnly );
+    stream << address.toIPv4Address();
+  }
+  SetOption( DhcpOption::DHCP_SERVER_IDENTIFIER, data );
+}
+
+void dhcp_message_t::SetLeaseTime(int seconds)
+{
+  QByteArray lease_time;
+  {
+    QDataStream stream( &lease_time, QIODevice::WriteOnly );
+    stream << quint32( 60 * 5 );
+  }
+  SetOption( DhcpOption::IP_LEASE_TIME, lease_time );
+}
+
+void dhcp_message_t::SetSubnet(QHostAddress address)
+{
+  QByteArray data;
+  {
+    QDataStream stream( &data, QIODevice::WriteOnly );
+    stream << address.toIPv4Address();
+  }
+  SetOption( DhcpOption::SUBNET_MASK, data );
+}
+
+void dhcp_message_t::SetDns(QHostAddress address)
+{
+  QByteArray data;
+  {
+    QDataStream stream( &data, QIODevice::WriteOnly );
+    stream << address.toIPv4Address();
+  }
+  SetOption( DhcpOption::DNS, data );
 }
 
 QString dhcp_message_t::toString() const
@@ -199,43 +226,51 @@ QString dhcp_message_t::toString() const
   ;
 }
 
-//QByteArray dhcp_message_t::serialize() const
-//{
-//  QByteArray array;
-//  array.reserve( MIN_DHCP_SIZE );
+QByteArray dhcp_message_t::serialize() const
+{
+  QByteArray array;
 
-//  dhcp_header_t header;
-//  header.op = static_cast<uint8_t>( m_operation );
-//  header.htype = static_cast<uint8_t>( m_hardware_type );
+  array.append( header.serialize() );
 
-//  header.hlen = 6; //mac length
-//  header.hops = 0;
-//  header.xid = m_transaction_id;
-//  header.secs = 0;
-//  header.flags = ( m_is_broadcast ? 0x01 : 0x00 );
-//  header.ciaddr = m_address_client.toIPv4Address();
-//  header.yiaddr = m_address_yours.toIPv4Address();
-//  header.siaddr = m_address_nextServer.toIPv4Address();
-//  header.giaddr = m_address_relay.toIPv4Address();
-//  // ::strncpy( &header.chaddr, "", 1 );
-//  // ::strncpy( &header.sname, "", 1 );
-//  // ::strncpy( &header.file, "", 1 );
-//  header.cookie[0] = 0x63;
-//  header.cookie[1] = 0x82;
-//  header.cookie[2] = 0x53;
-//  header.cookie[3] = 0x63;
-//  ::memcpy( array.data(), &header, MIN_DHCP_SIZE );
-////  array.append( static_cast<const char*>( &header ), sizeof(dhcp_header_t) );
+  auto i = m_options.constBegin();
+  while( i != m_options.constEnd() )
+  {
+    array.append( static_cast<quint8>( i.key() ) );
+    array.append( (quint8)i.value().length() );
+    array.append( i.value() );
 
-//  auto i = m_options.constBegin();
-//  while( i != m_options.constEnd() )
-//  {
-//    array.append( static_cast<uint8_t>( i.key() ) );
-//    array.append( i.value() );
+    ++i;
+  }
 
-//    ++i;
-//  }
+  array.append( static_cast<quint8>( DhcpOption::END ) ); // always the last option
+  return array;
+}
 
-//  array.append( static_cast<uint8_t>( DhcpOption::END ) ); // always the last option
-//  return array;
-//}
+dhcp_message_t dhcp_message_t::CreateOffer( QHostAddress offered_address )
+{
+  dhcp_message_t dhcp;
+  dhcp.header.operation = BootpOpType::BOOT_REPLY;
+  dhcp.SetRequestType( DhcpRequestType::DHCPOFFER );
+  dhcp.SetRouter( QHostAddress("192.168.1.1") );
+  dhcp.m_address_yours = offered_address;
+
+  return dhcp;
+}
+
+dhcp_message_t dhcp_message_t::CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac )
+{
+  dhcp_message_t dhcp;
+  dhcp.SetRequestType( DhcpRequestType::DHCPACK );
+  dhcp.header.operation = BootpOpType::BOOT_REPLY;
+
+  dhcp.SetClientAddress( client_addresss );
+  dhcp.SetClientMAC( client_mac );
+
+  return dhcp;
+}
+
+dhcp_message_t dhcp_message_t::CreateNAK()
+{
+  dhcp_message_t dhcp;
+  return dhcp;
+}

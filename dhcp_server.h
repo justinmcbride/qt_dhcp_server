@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QtNetwork/QUdpSocket>
+#include <QNetworkInterface>
 
 #include "dhcp_message.h"
 
@@ -27,4 +28,10 @@ class dhcp_server_t : public QObject
     void performOffer( dhcp_message_t request );
 
     QHostAddress getAddress( mac_address_t client_id );
+
+    QHostAddress m_address_subnet{ "255.255.255.0" };
+    QHostAddress m_address_dns{ "8.8.8.8" };
+
+    QHostAddress m_server_address;
+    QNetworkInterface m_server_interface;
 };

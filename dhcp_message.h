@@ -47,9 +47,7 @@ class dhcp_message_t
 {
   public:
     bootp_t header;
-    quint32 m_transaction_id;
 
-    int m_seconds{ 0 };
     mac_address_t m_client_id;
     bool m_is_broadcast;
 
@@ -69,14 +67,14 @@ class dhcp_message_t
   public:
 
     void SetRequestType( DhcpRequestType type );
-    void SetOperationType( BootpOpType type );
-    void SetHardwareType( int type );
-    void SetHops( int hops );
-    void SetTransactionId( uint32_t transaction_id ) { m_transaction_id = transaction_id; }
     void SetClientMAC( mac_address_t client_mac );
     void SetOption( DhcpOption option, QByteArray options_data );
-    void SetRouter( QHostAddress router_address );
-    void SetClientAddress( QHostAddress client_addresss );
+    void SetRouter( QHostAddress address );
+    void SetClientAddress( QHostAddress address );
+    void SetServerIdentifier( QHostAddress address );
+    void SetLeaseTime( int seconds );
+    void SetDns( QHostAddress address );
+    void SetSubnet( QHostAddress address );
 
     DhcpRequestType GetRequestType() const { return request_type; }
     
@@ -85,59 +83,9 @@ class dhcp_message_t
 
     QString toString() const;
     QByteArray serialize() const;
+
+    static dhcp_message_t CreateOffer( QHostAddress offered_address );
+    static dhcp_message_t CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac );
+    static dhcp_message_t CreateNAK();
 };
 
-static dhcp_message_t CreateDiscover()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
-static dhcp_message_t CreateOffer( QHostAddress offered_address )
-{
-  dhcp_message_t dhcp;
-  dhcp.SetOperationType( BootpOpType::BOOT_REPLY );
-  dhcp.SetRequestType( DhcpRequestType::DHCPOFFER );
-  dhcp.SetRouter( QHostAddress("192.168.1.1") );
-  dhcp.m_address_yours = offered_address;
-
-  return dhcp;
-}
-
-static dhcp_message_t CreateRequest()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
-static dhcp_message_t CreateDecline()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
-static dhcp_message_t CreateACK( uint32_t transaction_id, QHostAddress client_addresss, mac_address_t client_mac )
-{
-  dhcp_message_t dhcp;
-  dhcp.SetRequestType( DhcpRequestType::DHCPACK );
-  dhcp.SetOperationType( BootpOpType::BOOT_REPLY );
-  dhcp.SetHardwareType( 1 );
-  dhcp.SetTransactionId( transaction_id );
-  dhcp.SetClientAddress( client_addresss );
-  dhcp.SetClientMAC( client_mac );
-
-  return dhcp;
-}
-
-static dhcp_message_t CreateNAK()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
-static dhcp_message_t CreateRelease()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
-static dhcp_message_t CreateInform()
-{
-  dhcp_message_t dhcp;
-  return dhcp;
-}
