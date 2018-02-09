@@ -4,6 +4,7 @@
 #include "window_fake_client.h"
 
 #include <QNetworkInterface>
+#include <QPushButton>
 
 WindowMain::WindowMain( QWidget* parent ) :
   QMainWindow( parent ),
@@ -34,6 +35,18 @@ WindowMain::WindowMain( QWidget* parent ) :
     window->exec();
   } );
 
+  connect( ui->button_server_state, &QPushButton::toggled , [=] (bool checked) {
+    bool server_state = m_server->SetState( checked );
+    if( server_state )
+    {
+      ui->button_server_state->setText( "Server is ON" );
+    }
+    else
+    {
+      ui->button_server_state->setText( "Server is OFF" );
+    }
+  } );
+
   ui->statusBar->addWidget( m_label_count );
 }
 
@@ -52,5 +65,5 @@ void WindowMain::LogMessage( QString message )
 
 void WindowMain::slot_interface_changed( int index )
 {
-  m_server->setup( ui->cb_interface->itemData(index).toInt() );
+  m_server->SetInterface( ui->cb_interface->itemData(index).toInt() );
 }

@@ -3,7 +3,8 @@ QT += core gui network widgets
 TARGET = DHCP_Server
 TEMPLATE = app
 
-SOURCES += main.cpp\
+SOURCES += \
+    main.cpp\
     dhcp_server.cpp \
     dhcp_message.cpp \
     window_fake_client.cpp \
@@ -14,9 +15,9 @@ SOURCES += main.cpp\
     static_assignment_t.cpp \
     dhcp_assignments.cpp \
     bootp.cpp \
-    mac_address.cpp
+    mac_address.cpp \
 
-HEADERS  += \
+HEADERS += \
     dhcp_server.h \
     dhcp_message.h \
     window_fake_client.h \
@@ -31,7 +32,7 @@ HEADERS  += \
     bootp.h \
     mac_address.h
 
-FORMS    += \
+FORMS += \
     window_fake_client.ui \
     form_assignments.ui \
     window_main.ui

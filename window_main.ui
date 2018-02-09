@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>DHCP Server</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="layout_left">
         <property name="spacing">
          <number>0</number>
@@ -37,7 +37,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="layout_right">
         <item>
          <layout class="QFormLayout" name="formLayout">
@@ -61,75 +61,94 @@
           <item row="1" column="1">
            <widget class="QLineEdit" name="le_router"/>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_lease_seconds">
-            <property name="text">
-             <string>Lease Duration -- Seconds</string>
+          <item row="2" column="0" colspan="2">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Lease Duration</string>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="sb_lease_seconds">
-            <property name="maximum">
-             <number>59</number>
-            </property>
-            <property name="value">
-             <number>30</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_lease_minutes">
-            <property name="text">
-             <string>Lease Duration -- Minutes</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QSpinBox" name="sb_lease_minutes">
-            <property name="maximum">
-             <number>59</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_lease_hours">
-            <property name="text">
-             <string>Lease Duration -- Hours</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QSpinBox" name="sb_lease_hours">
-            <property name="maximum">
-             <number>59</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_lease_days">
-            <property name="text">
-             <string>Lease Duration -- Days</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QSpinBox" name="sb_lease_days">
-            <property name="maximum">
-             <number>59</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_lease_seconds">
+               <property name="text">
+                <string>Seconds</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="sb_lease_seconds">
+               <property name="maximum">
+                <number>59</number>
+               </property>
+               <property name="value">
+                <number>30</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_lease_hours">
+               <property name="text">
+                <string>Hours</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_lease_days">
+               <property name="text">
+                <string>Days</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_lease_minutes">
+               <property name="text">
+                <string>Minutes</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="sb_lease_minutes">
+               <property name="maximum">
+                <number>59</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="sb_lease_hours">
+               <property name="maximum">
+                <number>23</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="sb_lease_days">
+               <property name="maximum">
+                <number>59</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="button_server_state">
+          <property name="text">
+           <string>Server is OFF</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

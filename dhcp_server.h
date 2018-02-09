@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QQueue>
 #include <QtNetwork/QUdpSocket>
 #include <QNetworkInterface>
 
@@ -14,9 +15,10 @@ class dhcp_server_t : public QObject
   Q_OBJECT
 
   public:
-    explicit dhcp_server_t( QObject *parent = nullptr );
+    dhcp_server_t( QObject* parent = nullptr );
 
-    void setup( int interface_index );
+    void SetInterface( int interface_index );
+    bool SetState( bool on );
   signals:
     void LogMessage( QString message );
   public slots:
@@ -26,6 +28,9 @@ class dhcp_server_t : public QObject
   private:
     QUdpSocket* m_socket_listener{ nullptr };
     void performOffer( dhcp_message_t request );
+
+    QQueue<int> m_addresses_taken;
+    QQueue<int> m_addresses_free;
 
     QHostAddress getAddress( mac_address_t client_id );
 

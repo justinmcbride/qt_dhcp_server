@@ -4,12 +4,12 @@
 #include <QNetworkDatagram>
 #include <QDataStream>
 
-dhcp_server_t::dhcp_server_t( QObject *parent ) :
+dhcp_server_t::dhcp_server_t( QObject* parent ) :
   QObject( parent )
 {
 }
 
-void dhcp_server_t::setup( int interface_index )
+void dhcp_server_t::SetInterface( int interface_index )
 {
   if( m_socket_listener )
   {
@@ -19,10 +19,29 @@ void dhcp_server_t::setup( int interface_index )
   }
   m_server_interface = QNetworkInterface::interfaceFromIndex( interface_index );
   m_server_address = m_server_interface.addressEntries().back().ip().toString();
-  m_socket_listener = new QUdpSocket( this );
-  connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
-  bool b = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
-  emit LogMessage( QString( "Bind success: %1" ).arg( b ? "true" : "false" ) );
+}
+
+bool dhcp_server_t::SetState( bool on )
+{
+  if( on )
+  {
+    m_socket_listener = new QUdpSocket( this );
+    connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
+    bool is_bound = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
+    emit LogMessage( QString( "Server socket connected: %1" ).arg( is_bound ? "true" : "false" ) );
+    return is_bound;
+  }
+  else
+  {
+    emit LogMessage( "Shutting down server" );
+    if( m_socket_listener )
+    {
+      emit LogMessage( "Deleting old server socket" );
+      delete m_socket_listener;
+      m_socket_listener = nullptr;
+    }
+    return false;
+  }
 }
 
 void dhcp_server_t::readPendingDatagrams()
