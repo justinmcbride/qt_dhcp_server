@@ -9,6 +9,7 @@
 #include <QHostAddress>
 
 #include "dhcp_option.h"
+#include "mac_address.h"
 #include "bootp.h"
 
 
@@ -70,7 +71,6 @@ class dhcp_message_t
     void SetClientMAC( mac_address_t client_mac );
     void SetOption( DhcpOption option, QByteArray options_data );
     void SetRouter( QHostAddress address );
-    void SetClientAddress( QHostAddress address );
     void SetServerIdentifier( QHostAddress address );
     void SetLeaseTime( int seconds );
     void SetDns( QHostAddress address );

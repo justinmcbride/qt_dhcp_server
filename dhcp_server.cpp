@@ -9,6 +9,12 @@ dhcp_server_t::dhcp_server_t( QObject* parent ) :
 {
 }
 
+void dhcp_server_t::SetRouter( QHostAddress address )
+{
+  m_address_router = address;
+  m_assignments->SetBaseAddress( address );
+}
+
 void dhcp_server_t::SetInterface( int interface_index )
 {
   if( m_socket_listener )
@@ -84,10 +90,11 @@ void dhcp_server_t::performOffer( dhcp_message_t request )
    messages to 0xffffffff.
   */
 
-  auto response = dhcp_message_t::CreateOffer( QHostAddress() );
+  auto offering_address = m_assignments->GetAssignment( request.m_client_id );
+
+  auto response = dhcp_message_t::CreateOffer( offering_address );
   response.header.transaction_id = request.header.transaction_id;
-  response.SetRouter( QHostAddress( "192.168.1.1" ) );
-  response.SetClientAddress( getAddress( request.m_client_id ) );
+  response.SetRouter( m_address_router );
   response.SetSubnet( m_address_subnet );
   response.SetDns( m_address_dns );
   response.SetClientMAC( request.header.hardware_address_client );
@@ -116,7 +123,3 @@ void dhcp_server_t::performOffer( dhcp_message_t request )
   m_socket_listener->writeDatagram( response_data, target, PORT_DHCP_CLIENT );
 }
 
-QHostAddress dhcp_server_t::getAddress( mac_address_t client_id )
-{
-  return QHostAddress( "192.168.86.51" );
-}

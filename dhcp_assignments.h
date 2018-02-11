@@ -1,23 +1,36 @@
 #pragma once
 
 #include <QVector>
+#include <QMap>
 #include <QString>
 
-#include "static_assignment_t.h"
+#include <memory>
+
+#include "static_assignment.h"
+#include "mac_address.h"
 
 class dhcp_assignments_t
 {
   public:
-    dhcp_assignments_t();
+    static std::shared_ptr<dhcp_assignments_t> get();
+
+    void SetBaseAddress( QHostAddress new_base );
 
     void AddAssignment( QString target, QString address );
     void RemoveAssignment( QString target );
 
-    QVector<static_assignment_t> GetAssignments() const;
-    const static_assignment_t& GetAssignment( int index ) const;
-    static_assignment_t GetAssignment( QString address ) const;
+    QVector<static_assignment_t> GetAllStaticAssignments() const;
+    const static_assignment_t& GetStaticAssignment( int index ) const;
+    QHostAddress GetAssignment( mac_address_t client_address );
 
     int size() const { return m_assignments.size(); }
   private:
-    QVector<static_assignment_t> m_assignments;
+    dhcp_assignments_t();
+
+    QMap<mac_address_t, static_assignment_t> m_assignments;
+    QVector<static_assignment_t> m_assignments_static;
+
+    QHostAddress m_address_base;
+
+    int m_next_inc{ 1 };
 };

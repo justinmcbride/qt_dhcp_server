@@ -36,6 +36,9 @@ WindowMain::WindowMain( QWidget* parent ) :
   } );
 
   connect( ui->button_server_state, &QPushButton::toggled , [=] (bool checked) {
+    auto router = ui->le_router->text();
+    m_server->SetRouter( QHostAddress(router) );
+
     bool server_state = m_server->SetState( checked );
     if( server_state )
     {

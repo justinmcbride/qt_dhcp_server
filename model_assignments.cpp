@@ -2,22 +2,22 @@
 
 #include "model_assignments.h"
 
-ModelAssignments::ModelAssignments(QObject *parent)
-  : QAbstractTableModel(parent)
+ModelAssignments::ModelAssignments( QObject* parent )
+  : QAbstractTableModel( parent )
 {
 }
 
-int ModelAssignments::rowCount(const QModelIndex &parent) const
+int ModelAssignments::rowCount( const QModelIndex& ) const
 {
-  return m_assignments.size();
+  return m_assignments->size();
 }
 
-int ModelAssignments::columnCount(const QModelIndex &parent) const
+int ModelAssignments::columnCount( const QModelIndex& ) const
 {
   return 2;
 }
 
-QVariant ModelAssignments::data(const QModelIndex &index, int role) const
+QVariant ModelAssignments::data( const QModelIndex& index, int role ) const
 {
   if (!index.isValid())
     return QVariant();
@@ -25,16 +25,16 @@ QVariant ModelAssignments::data(const QModelIndex &index, int role) const
   int row = index.row();
   int col = index.column();
 
-  auto assignment = m_assignments.GetAssignment( row );
+  auto assignment = m_assignments->GetStaticAssignment( row );
   if( role == Qt::DisplayRole )
     {
-      if( col == 0 )           return assignment.address();
+      if( col == 0 )           return assignment.address().toString();
       else if( col == 1 )      return assignment.ip().toString();
     }
   return QVariant();
 }
 
-bool ModelAssignments::setData(const QModelIndex &index, const QVariant &value, int role)
+bool ModelAssignments::setData( const QModelIndex& index, const QVariant& value, int role )
 {
   if (data(index, role) != value) {
     // FIXME: Implement me!
@@ -44,37 +44,41 @@ bool ModelAssignments::setData(const QModelIndex &index, const QVariant &value, 
   return false;
 }
 
-Qt::ItemFlags ModelAssignments::flags(const QModelIndex &index) const
+Qt::ItemFlags ModelAssignments::flags( const QModelIndex& index ) const
 {
   return ( Qt::ItemIsEditable | QAbstractTableModel::flags(index) );
 }
 
-bool ModelAssignments::insertRows(int row, int count, const QModelIndex &parent)
+bool ModelAssignments::insertRows( int row, int count, const QModelIndex& parent )
 {
   beginInsertRows(parent, row, row + count - 1);
   // FIXME: Implement me!
   endInsertRows();
+  return true;
 }
 
-bool ModelAssignments::insertColumns(int column, int count, const QModelIndex &parent)
+bool ModelAssignments::insertColumns( int column, int count, const QModelIndex& parent )
 {
   beginInsertColumns(parent, column, column + count - 1);
   // FIXME: Implement me!
   endInsertColumns();
+  return true;
 }
 
-bool ModelAssignments::removeRows(int row, int count, const QModelIndex &parent)
+bool ModelAssignments::removeRows( int row, int count, const QModelIndex& parent )
 {
   beginRemoveRows(parent, row, row + count - 1);
   // FIXME: Implement me!
   endRemoveRows();
+  return true;
 }
 
-bool ModelAssignments::removeColumns(int column, int count, const QModelIndex &parent)
+bool ModelAssignments::removeColumns( int column, int count, const QModelIndex& parent )
 {
   beginRemoveColumns(parent, column, column + count - 1);
   // FIXME: Implement me!
   endRemoveColumns();
+  return true;
 }
 
 QVariant ModelAssignments::headerData( int section, Qt::Orientation orientation, int role ) const

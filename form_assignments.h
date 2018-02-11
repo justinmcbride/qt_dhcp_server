@@ -18,7 +18,7 @@ class FormAssignments : public QWidget
     ~FormAssignments();
 
   private:
-    Ui::FormAssignments* ui;
+    Ui::FormAssignments* ui{ nullptr };
     QSortFilterProxyModel* m_model_proxy{ new QSortFilterProxyModel( this ) };
     ModelAssignments* m_model_assignments{ new ModelAssignments( this ) };
 };

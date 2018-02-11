@@ -1,15 +1,10 @@
-#include "static_assignment_t.h"
+#include "static_assignment.h"
 
-static_assignment_t::static_assignment_t( QString address, QHostAddress ip ) :
+static_assignment_t::static_assignment_t( mac_address_t address, QHostAddress ip ) :
   m_address( address ),
   m_ip( ip )
 {
 
-}
-
-QString static_assignment_t::address() const
-{
-  return m_address;
 }
 
 QHostAddress static_assignment_t::ip() const

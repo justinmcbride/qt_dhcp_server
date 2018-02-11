@@ -32,5 +32,5 @@ class ModelAssignments : public QAbstractTableModel
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   private:
-    dhcp_assignments_t m_assignments;
+    std::shared_ptr<dhcp_assignments_t> m_assignments{ dhcp_assignments_t::get() };
 };

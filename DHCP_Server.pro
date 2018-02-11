@@ -12,7 +12,7 @@ SOURCES += \
     form_assignments.cpp \
     model_assignments.cpp \
     window_main.cpp \
-    static_assignment_t.cpp \
+    static_assignment.cpp \
     dhcp_assignments.cpp \
     bootp.cpp \
     mac_address.cpp \
@@ -26,7 +26,7 @@ HEADERS += \
     model_assignments.h \
     global_config.h \
     window_main.h \
-    static_assignment_t.h \
+    static_assignment.h \
     dhcp_assignments.h \
     dhcp_option.h \
     bootp.h \

@@ -155,7 +155,7 @@ void dhcp_message_t::SetClientMAC( mac_address_t client_mac )
   header.hardware_address_type = BootpHwType::ETHERNET;
 }
 
-void dhcp_message_t::SetOption(DhcpOption option, QByteArray options_data)
+void dhcp_message_t::SetOption( DhcpOption option, QByteArray options_data )
 {
   if( option == DhcpOption::END ) return; // end option needs to at the end of every message... we'll do it manually
   m_options[option] = options_data;
@@ -171,12 +171,7 @@ void dhcp_message_t::SetRouter( QHostAddress address )
   SetOption( DhcpOption::ROUTER, data );
 }
 
-void dhcp_message_t::SetClientAddress(QHostAddress address)
-{
-  m_address_client = address;
-}
-
-void dhcp_message_t::SetServerIdentifier(QHostAddress address)
+void dhcp_message_t::SetServerIdentifier( QHostAddress address )
 {
   QByteArray data;
   {
@@ -186,17 +181,17 @@ void dhcp_message_t::SetServerIdentifier(QHostAddress address)
   SetOption( DhcpOption::DHCP_SERVER_IDENTIFIER, data );
 }
 
-void dhcp_message_t::SetLeaseTime(int seconds)
+void dhcp_message_t::SetLeaseTime( int seconds )
 {
   QByteArray lease_time;
   {
     QDataStream stream( &lease_time, QIODevice::WriteOnly );
-    stream << quint32( 60 * 5 );
+    stream << quint32( seconds );
   }
   SetOption( DhcpOption::IP_LEASE_TIME, lease_time );
 }
 
-void dhcp_message_t::SetSubnet(QHostAddress address)
+void dhcp_message_t::SetSubnet( QHostAddress address )
 {
   QByteArray data;
   {
@@ -206,7 +201,7 @@ void dhcp_message_t::SetSubnet(QHostAddress address)
   SetOption( DhcpOption::SUBNET_MASK, data );
 }
 
-void dhcp_message_t::SetDns(QHostAddress address)
+void dhcp_message_t::SetDns( QHostAddress address )
 {
   QByteArray data;
   {
@@ -251,7 +246,6 @@ dhcp_message_t dhcp_message_t::CreateOffer( QHostAddress offered_address )
   dhcp_message_t dhcp;
   dhcp.header.operation = BootpOpType::BOOT_REPLY;
   dhcp.SetRequestType( DhcpRequestType::DHCPOFFER );
-  dhcp.SetRouter( QHostAddress("192.168.1.1") );
   dhcp.m_address_yours = offered_address;
 
   return dhcp;
@@ -263,7 +257,7 @@ dhcp_message_t dhcp_message_t::CreateACK( uint32_t transaction_id, QHostAddress 
   dhcp.SetRequestType( DhcpRequestType::DHCPACK );
   dhcp.header.operation = BootpOpType::BOOT_REPLY;
 
-  dhcp.SetClientAddress( client_addresss );
+  dhcp.m_address_yours = client_addresss;
   dhcp.SetClientMAC( client_mac );
 
   return dhcp;
