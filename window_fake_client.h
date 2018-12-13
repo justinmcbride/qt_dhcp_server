@@ -1,5 +1,4 @@
-#ifndef WINDOW_FAKE_CLIENT_H
-#define WINDOW_FAKE_CLIENT_H
+#pragma once
 
 #include <QDialog>
 
@@ -9,7 +8,7 @@ namespace Ui {
 
 class WindowFakeClient : public QDialog
 {
-    Q_OBJECT
+  Q_OBJECT
 
   public:
     explicit WindowFakeClient(QWidget *parent = 0);
@@ -18,5 +17,3 @@ class WindowFakeClient : public QDialog
   private:
     Ui::WindowFakeClient *ui;
 };
-
-#endif // WINDOW_FAKE_CLIENT_H

@@ -22,7 +22,7 @@ class dhcp_server_t : public QObject
     bool SetState( bool on );
     void SetRouter( QHostAddress address );
   signals:
-    void LogMessage( QString message );
+    void signal_receivedRequest( dhcp_message_t );
   public slots:
   private slots:
     void readPendingDatagrams();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>WindowMain</class>
+ <widget class="QMainWindow" name="WindowMain">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,11 +29,7 @@
          <widget class="FormAssignments" name="assignments" native="true"/>
         </item>
         <item>
-         <widget class="QTextEdit" name="te_log">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="QTableView" name="table_log"/>
         </item>
        </layout>
       </widget>
@@ -160,14 +156,13 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>704</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

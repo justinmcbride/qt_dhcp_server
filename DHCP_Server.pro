@@ -16,6 +16,8 @@ SOURCES += \
     dhcp_assignments.cpp \
     bootp.cpp \
     mac_address.cpp \
+    form_dhcp_structure.cpp \
+    model_dhcp_log.cpp
 
 HEADERS += \
     dhcp_server.h \
@@ -30,9 +32,12 @@ HEADERS += \
     dhcp_assignments.h \
     dhcp_option.h \
     bootp.h \
-    mac_address.h
+    mac_address.h \
+    form_dhcp_structure.h \
+    model_dhcp_log.h
 
 FORMS += \
     window_fake_client.ui \
     form_assignments.ui \
-    window_main.ui
+    window_main.ui \
+    form_dhcp_structure.ui

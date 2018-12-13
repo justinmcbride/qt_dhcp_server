@@ -19,7 +19,7 @@ void dhcp_server_t::SetInterface( int interface_index )
 {
   if( m_socket_listener )
   {
-    emit LogMessage( "Deleting old server socket" );
+    qDebug() << "Deleting old server socket";
     delete m_socket_listener;
     m_socket_listener = nullptr;
   }
@@ -34,15 +34,15 @@ bool dhcp_server_t::SetState( bool on )
     m_socket_listener = new QUdpSocket( this );
     connect( m_socket_listener, &QUdpSocket::readyRead, this, &dhcp_server_t::readPendingDatagrams );
     bool is_bound = m_socket_listener->bind( PORT_DHCP_SERVER, QUdpSocket::ShareAddress );
-    emit LogMessage( QString( "Server socket connected: %1" ).arg( is_bound ? "true" : "false" ) );
+    qDebug() << "Server socket connected: " << ( is_bound ? "true" : "false" );
     return is_bound;
   }
   else
   {
-    emit LogMessage( "Shutting down server" );
+    qDebug() << "Shutting down server";
     if( m_socket_listener )
     {
-      emit LogMessage( "Deleting old server socket" );
+      qDebug() << "Deleting old server socket";
       delete m_socket_listener;
       m_socket_listener = nullptr;
     }
@@ -58,7 +58,9 @@ void dhcp_server_t::readPendingDatagrams()
     try
     {
       dhcp_message_t client_request( datagram.data() );
-      emit LogMessage( client_request.toString() );
+      qDebug() << client_request.toString();
+      signal_receivedRequest( client_request );
+
       const auto type = client_request.GetRequestType();
       switch( type )
       {

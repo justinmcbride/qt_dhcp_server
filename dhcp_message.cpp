@@ -266,5 +266,7 @@ dhcp_message_t dhcp_message_t::CreateACK( uint32_t transaction_id, QHostAddress 
 dhcp_message_t dhcp_message_t::CreateNAK()
 {
   dhcp_message_t dhcp;
+
+  dhcp.SetRequestType( DhcpRequestType::DHCPNAK );
   return dhcp;
 }

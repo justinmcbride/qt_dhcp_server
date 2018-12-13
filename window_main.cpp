@@ -8,11 +8,13 @@
 
 WindowMain::WindowMain( QWidget* parent ) :
   QMainWindow( parent ),
-  ui( new Ui::MainWindow )
+  ui( new Ui::WindowMain )
 {
   ui->setupUi( this );
-  connect( m_server, &dhcp_server_t::LogMessage, this, &WindowMain::LogMessage );
+  connect( m_server, &dhcp_server_t::signal_receivedRequest, this, &WindowMain::slot_receivedRequest );
   connect( ui->cb_interface, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &WindowMain::slot_interface_changed );
+
+  ui->table_log->setModel( m_log );
 
   auto interfaces = QNetworkInterface::allInterfaces();
   for( auto interface : interfaces )
@@ -49,8 +51,6 @@ WindowMain::WindowMain( QWidget* parent ) :
       ui->button_server_state->setText( "Server is OFF" );
     }
   } );
-
-  ui->statusBar->addWidget( m_label_count );
 }
 
 WindowMain::~WindowMain()
@@ -58,12 +58,9 @@ WindowMain::~WindowMain()
   delete ui;
 }
 
-void WindowMain::LogMessage( QString message )
+void WindowMain::slot_receivedRequest( dhcp_message_t dhcp_message )
 {
-  static int count = 0;
-  count++;
-  ui->te_log->append( message );
-  m_label_count->setText( QString("Messages: %1").arg(count) );
+  m_log->AddRequest( dhcp_message );
 }
 
 void WindowMain::slot_interface_changed( int index )
