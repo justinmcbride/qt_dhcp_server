@@ -43,8 +43,8 @@ QVariant model_dhcp_log_t::data( const QModelIndex& index, int role ) const
   if( role == Qt::DisplayRole )
   {
     if( column == model_dhcp_headers_e::OPERATION_TYPE )            return toString( dhcp.request_type );
-    else if( column == model_dhcp_headers_e::CLIENT_MAC )           return "MAC HERE";
-    else if( column == model_dhcp_headers_e::CLIENT_GIVEN_ADDRESS ) return "IP HERE";
+    else if( column == model_dhcp_headers_e::CLIENT_MAC )           return dhcp.m_client_id.toString();
+    else if( column == model_dhcp_headers_e::CLIENT_GIVEN_ADDRESS ) return dhcp.m_address_client.toString();
   }
   // else if( role == Qt::ForegroundRole )
   // {
@@ -63,4 +63,9 @@ void model_dhcp_log_t::AddRequest( dhcp_message_t dhcp_request )
   beginInsertRows( QModelIndex(), m_requests.size(), m_requests.size() );
   m_requests.push_back( dhcp_request );
   endInsertRows();
+}
+
+dhcp_message_t model_dhcp_log_t::GetItem( int index )
+{
+  return m_requests.at( index );
 }

@@ -1,10 +1,12 @@
+#include <QNetworkInterface>
+#include <QPushButton>
+#include <QTableView>
+
 #include "window_main.h"
 #include "ui_window_main.h"
 
 #include "window_fake_client.h"
-
-#include <QNetworkInterface>
-#include <QPushButton>
+#include "form_dhcp_structure.h"
 
 WindowMain::WindowMain( QWidget* parent ) :
   QMainWindow( parent ),
@@ -51,6 +53,18 @@ WindowMain::WindowMain( QWidget* parent ) :
       ui->button_server_state->setText( "Server is OFF" );
     }
   } );
+
+  connect( ui->table_log, &QTableView::doubleClicked, this, &WindowMain::slot_dclicked_item );
+}
+
+void WindowMain::slot_dclicked_item( const QModelIndex& item )
+{
+//  auto true_index = m_log->mapToSource( item );
+  auto request = m_log->GetItem( item.row() );
+  auto window = new FormDhcpStructure( request, this );
+  window->setModal( true );
+  window->setAttribute( Qt::WA_DeleteOnClose, true );
+  window->exec();
 }
 
 WindowMain::~WindowMain()

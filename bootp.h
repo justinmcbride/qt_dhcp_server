@@ -1,14 +1,22 @@
 #pragma once
 
-#include "mac_address.h"
-
 #include <QByteArray>
 #include <QDebug>
+
+#include "mac_address.h"
 
 enum class BootpOpType : quint8 {
   BOOT_REQUEST = 1,
   BOOT_REPLY = 2
 };
+
+static inline QString toString( BootpOpType op )
+{
+  if( op == BootpOpType::BOOT_REQUEST )    return "BOOT_REQUEST";
+  else if( op == BootpOpType::BOOT_REPLY ) return "BOOT_REPLY";
+  else return QString("UNKNOWN %1").arg(static_cast<int>(op));
+}
+
 
 enum class BootpHwType : quint8 {
   ETHERNET = 1

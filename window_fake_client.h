@@ -11,9 +11,9 @@ class WindowFakeClient : public QDialog
   Q_OBJECT
 
   public:
-    explicit WindowFakeClient(QWidget *parent = 0);
+    explicit WindowFakeClient( QWidget* parent = nullptr );
     ~WindowFakeClient();
 
   private:
-    Ui::WindowFakeClient *ui;
+    Ui::WindowFakeClient* ui{ nullptr };
 };

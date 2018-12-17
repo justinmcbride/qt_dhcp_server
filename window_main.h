@@ -30,4 +30,5 @@ class WindowMain : public QMainWindow
   private slots:
     void slot_receivedRequest( dhcp_message_t dhcp_message );
     void slot_interface_changed( int index );
+    void slot_dclicked_item( const QModelIndex& item );
 };

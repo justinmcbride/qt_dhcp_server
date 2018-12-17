@@ -46,6 +46,7 @@ class model_dhcp_log_t : public QAbstractTableModel
 
     void AddRequest( dhcp_message_t dhcp_request );
 
-  private:
+    dhcp_message_t GetItem( int index );
+private:
     QVector< dhcp_message_t > m_requests;
 };

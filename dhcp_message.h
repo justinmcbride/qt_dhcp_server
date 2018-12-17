@@ -24,13 +24,6 @@ enum class DhcpRequestType : uint8_t {
   DHCPINFORM
 };
 
-//static inline QString toString( OpType op )
-//{
-//  if( op == OpType::BOOT_REQUEST ) return "BOOT_REQUEST";
-//  else if( op == OpType::BOOT_REPLY ) return "BOOT_REPLY";
-//  else return QString("UNKNOWN %1").arg(static_cast<int>(op));
-//}
-
 static inline QString toString( DhcpRequestType type )
 {
   if( type == DhcpRequestType::DHCPDISCOVER ) return "DHCPDISCOVER";

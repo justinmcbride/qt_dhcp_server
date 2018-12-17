@@ -1,22 +1,21 @@
-#ifndef FORM_DHCP_STRUCTURE_H
-#define FORM_DHCP_STRUCTURE_H
+#pragma once
 
-#include <QWidget>
+#include <QDialog>
+
+#include "dhcp_message.h"
 
 namespace Ui {
-class form_dhcp_structure;
+ class form_dhcp_structure;
 }
 
-class form_dhcp_structure : public QWidget
+class FormDhcpStructure : public QDialog
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    explicit form_dhcp_structure(QWidget *parent = nullptr);
-    ~form_dhcp_structure();
+  public:
+    explicit FormDhcpStructure( dhcp_message_t request, QWidget* parent = nullptr );
+    ~FormDhcpStructure();
 
-private:
-    Ui::form_dhcp_structure *ui;
+  private:
+    Ui::form_dhcp_structure* ui{ nullptr };
 };
-
-#endif // FORM_DHCP_STRUCTURE_H
